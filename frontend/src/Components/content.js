@@ -10,8 +10,8 @@ function Content() {
     const [content, setContent]=useState('')
 
     const handleInputImage = (e) => {
+        setImageUrl(URL.createObjectURL(e.target.files[0]))
         setContentImage(e.target.files[0])
-        setImageUrl(URL.createObjectURL(contentImage))
     }
 
     const handleInputSubject = (e) =>{
@@ -24,19 +24,40 @@ function Content() {
 
     const onClickSave = () =>{
 
-        let formData = new FormData();
+        // multipart/form-data
+        // let formData = new FormData();
 
-        const config = {
-            header: {'content-type': 'multipart/form-data'},
+        // const config = {
+        //     header: {'content-type': 'multipart/form-data'},
+        //     withCredentials: true
+        // }
+        
+        // formData.append("userId", sessionStorage.getItem('userId'))
+        // formData.append("image", contentImage)
+        // formData.append("subject", subject)
+        // formData.append("content", content)
+
+        // axios.post('http://localhost:4000/user/contentSave', formData, config)
+        // .then(res => {
+        //     if(res.data.msg === undefined){
+        //         alert('saved')
+        //     } else {
+        //         alert(res.data.msg)
+        //     }
+        // })
+        // .catch()
+
+        axios.post('http://localhost:4000/user/contentSave', 
+        {
+            "userId" : sessionStorage.getItem('userId'),
+            "subject" : subject,
+            "content" : content,
+            "image" : imageUrl
+        }, 
+        {
             withCredentials: true
         }
-        
-        formData.append("userId", sessionStorage.getItem('userId'))
-        formData.append("image", contentImage)
-        formData.append("subject", subject)
-        formData.append("content", content)
-
-        axios.post('http://localhost:4000/user/contentSave', formData, config)
+        )
         .then(res => {
             if(res.data.msg === undefined){
                 alert('saved')

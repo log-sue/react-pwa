@@ -3,7 +3,7 @@ const db_config = require('../config/mysql2.js');
 const pool = db_config.init();
 const router = express.Router();
 
-// isSignIn, get timeTable
+// isSignIn
 router.post('/isSignIn', function(req, res, next) {
     let msg = 'validation failed'
 
@@ -85,6 +85,8 @@ router.post('/contentSave', async function(req, res, next) {
     const connection = await pool.getConnection(async conn => conn);
     const sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
     const params = [, req.body.userId, req.body.content, req.body.subject, req.body.image]
+
+    console.log(req.body)
 
     let msg = undefined
     try {
