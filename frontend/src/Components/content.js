@@ -30,8 +30,9 @@ function Content() {
             header: {'content-type': 'multipart/form-data'},
             withCredentials: true
         }
-
-        formData.append("contentImage", contentImage)
+        
+        formData.append("userId", sessionStorage.getItem('userId'))
+        formData.append("image", contentImage)
         formData.append("subject", subject)
         formData.append("content", content)
 
