@@ -5,10 +5,11 @@ import { Content } from './';
 function Main() {
 
     const [state, setState] = useState(undefined)
+    const [contentId, setContentId] = useState(undefined)
     const [contentsList, setContentsList] = useState(undefined)
 
     useEffect(() => {
-        axios.post('http://localhost:4000/user/contentsList',
+        axios.post('http://localhost:4000/contents/list',
         {
             'userId': sessionStorage.getItem('userId'), 
             'sessionId': sessionStorage.getItem('sessionId')
@@ -27,8 +28,14 @@ function Main() {
         .catch()
     },[])
 
-    const onClickContent = () => {
-        setState('content')
+    const onClickAdd = () => {
+        setState('add')
+    }
+
+    const onClickView = (e) => {
+        setState('view')
+        setContentId(e.target.id)
+        console.log(e.target.id)
     }
     
     const onLogout = () => {
@@ -37,8 +44,11 @@ function Main() {
         document.location.href = '/';
     }
 
-    if(state === 'content'){
+    if(state === 'add'){
         return <Content />
+    }
+    else if(state === 'view'){
+        return <Content contentId={contentId} />
     }
     else{
         return(
@@ -86,7 +96,7 @@ function Main() {
                             <h1 class="fw-light">Album example</h1>
                             <p class="lead text-muted">Something short and leading about the collection below—its contents, the creator, etc. Make it short and sweet, but not too short so folks don’t simply skip over it entirely.</p>
                             <p>
-                            <a href="#" class="btn btn-primary my-2" onClick={onClickContent}>Add content</a>
+                            <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>Add content</a>
                             <a href="#" class="btn btn-secondary my-2">Secondary action</a>
                             </p>
                         </div>
@@ -95,22 +105,21 @@ function Main() {
     
                     <div class="album py-5 bg-light">
                         <div class="container">
-                            
-
-
-
-                            {/* card contents */}
                             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
-                                {contentsList && contentsList.map((subject) => (
+
+
+
+                                {/* card contents */}
+                                {contentsList && Object.keys(contentsList).map((contentId) => (
                                     <div class="col">
                                     <div class="card shadow-sm">
                                         <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
                         
                                         <div class="card-body">
-                                        <p class="card-text">{subject}</p>
+                                        <p class="card-text">{contentsList[contentId].subject}</p>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" id = {contentId} onClick={onClickView}>View</button>
                                             <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
                                             </div>
                                             <small class="text-muted">9 mins</small>
@@ -119,12 +128,10 @@ function Main() {
                                     </div>
                                     </div>
                                 ))}
+                                
+
+
                             </div>
-
-
-
-
-
                         </div>
                     </div>
                 </main>

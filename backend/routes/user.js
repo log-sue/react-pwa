@@ -55,50 +55,25 @@ router.post('/signUp', async function(req, res, next) {
     res.send({msg: msg, userId:req.body.id});
 });
 
-// contentsList
-router.post('/contentsList', async function(req, res, next) {
-    const connection = await pool.getConnection(async conn => conn);
-    const sql = 'SELECT * FROM usercontents WHERE userId = ?';
-    const params = [req.body.userId]
-
-    let msg = undefined
-
-    let contentsList = []
-
-    try {
-        const [rows] = await connection.query(sql, params);
-        for (const row of rows){ 
-            contentsList.push(row.subject)
-        }
-        console.log(contentsList)
-    } catch(err) {
-        msg = 'DB error'
-        console.log(err)
-    } finally { 
-        connection.release(); 
-    }
-    res.send({msg: msg, contentsList: contentsList});
-});
-
 // contentSave
-router.post('/contentSave', async function(req, res, next) {
-    const connection = await pool.getConnection(async conn => conn);
-    const sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
-    const params = [, req.body.userId, req.body.content, req.body.subject, req.body.image]
+// router.post('/contentSave', async function(req, res, next) {
+//     const connection = await pool.getConnection(async conn => conn);
+//     const sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
+//     const params = [, req.body.userId, req.body.content, req.body.subject, req.body.image]
 
-    console.log(req.body)
+//     console.log(req.body)
 
-    let msg = undefined
-    try {
-        const [results] = await connection.query(sql, params);
-    } catch(err) {
-        msg = 'DB error'
-        console.log(err)
-    } finally { 
-        connection.release(); 
-    }
-    res.send({msg: msg, userId:req.body.id});
-});
+//     let msg = undefined
+//     try {
+//         const [results] = await connection.query(sql, params);
+//     } catch(err) {
+//         msg = 'DB error'
+//         console.log(err)
+//     } finally { 
+//         connection.release(); 
+//     }
+//     res.send({msg: msg, userId:req.body.id});
+// });
 
 // logout
 // router.get("/logout", function(req,res){

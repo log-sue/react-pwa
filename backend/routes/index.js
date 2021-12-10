@@ -5,4 +5,8 @@ const router = express.Router();
 const user = require('./user.js');
 router.use('/user', user);
 
+// Contents information
+const contents = require('./contents.js');
+router.use('/contents', contents);
+
 module.exports = router;

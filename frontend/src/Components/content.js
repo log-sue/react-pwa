@@ -1,16 +1,41 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { Main } from '.';
 import axios from 'axios';
 
-function Content() {
+function Content(props) {
 
+    const [contentId, setContentId]=useState(undefined)
     const [imageUrl, setImageUrl]=useState('')
     const [contentImage, setContentImage]=useState('')
     const [subject, setSubject]=useState('')
     const [content, setContent]=useState('')
 
+    aaaaaaaaaaaaaaa  to do this aaaaaaaaaaaaaaaaaa
+    // useEffect(() => {
+    //     axios.post('http://localhost:4000/contents/',
+    //     {
+    //         'contentId': props.contentId,
+    //         'sessionId': sessionStorage.getItem('sessionId')
+    //     },
+    //     {
+    //         withCredentials: true
+    //     })
+    //     .then(res => {
+    //         if(res.data.msg === undefined){
+    //             setContentId(res.data.contentId)
+    //             setSubject(res.data.subject)
+    //             setContent(res.data.content)
+    //         } else {
+    //             alert(res.data.msg)
+    //         }
+    //     })
+    //     .catch()
+    // },[])
+
     const handleInputImage = (e) => {
+        // set url for image tag
         setImageUrl(URL.createObjectURL(e.target.files[0]))
+        // set image binary data
         setContentImage(e.target.files[0])
     }
 
@@ -25,39 +50,21 @@ function Content() {
     const onClickSave = () =>{
 
         // multipart/form-data
-        // let formData = new FormData();
+        let formData = new FormData();
 
-        // const config = {
-        //     header: {'content-type': 'multipart/form-data'},
-        //     withCredentials: true
-        // }
-        
-        // formData.append("userId", sessionStorage.getItem('userId'))
-        // formData.append("image", contentImage)
-        // formData.append("subject", subject)
-        // formData.append("content", content)
-
-        // axios.post('http://localhost:4000/user/contentSave', formData, config)
-        // .then(res => {
-        //     if(res.data.msg === undefined){
-        //         alert('saved')
-        //     } else {
-        //         alert(res.data.msg)
-        //     }
-        // })
-        // .catch()
-
-        axios.post('http://localhost:4000/user/contentSave', 
-        {
-            "userId" : sessionStorage.getItem('userId'),
-            "subject" : subject,
-            "content" : content,
-            "image" : imageUrl
-        }, 
-        {
+        // define config
+        const config = {
+            header: {'content-type': 'multipart/form-data'},
             withCredentials: true
         }
-        )
+        
+        formData.append("contentId", contentId)
+        formData.append("userId", sessionStorage.getItem('userId'))
+        formData.append("contentImage", contentImage)
+        formData.append("subject", subject)
+        formData.append("content", content)
+
+        axios.post('http://localhost:4000/contents/save', formData, config)
         .then(res => {
             if(res.data.msg === undefined){
                 alert('saved')
