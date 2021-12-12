@@ -19,6 +19,7 @@ router.post('/list', async function(req, res, next) {
     let msg = undefined
 
     let contentsList = {}
+    let imageList = {}
 
     try {
         const [rows] = await connection.query(sql, params);
@@ -29,10 +30,14 @@ router.post('/list', async function(req, res, next) {
                 subject: row.subject, 
                 image: row.image
             }
+            imageList[row.image] = row.contentId
         }
 
-        // save contentsList in session
+        // save contentsList in session for main
         req.session.contentsList = contentsList
+
+        // save user image list for content
+        req.session.imageList = imageList
 
         console.log(contentsList)
     } catch(err) {
@@ -72,9 +77,36 @@ router.post('/save', async function(req, res, next) {
         } else {
             // Upload was successful
             const connection = await pool.getConnection(async conn => conn);
-            const sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
-            const params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename]
 
+            // select sql
+            const sqlSelector = function(){
+                let sql = ''
+                let params = ''
+                if(req.body.contentId !== 'undefined'){
+                    if(req.body.contentImage !== 'undefined'){
+                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ?, image = ? WHERE contentId = ?';
+                        params = [req.body.userId, req.body.content, req.body.subject, req.file.filename, req.body.contentId]
+                    }
+                    else{
+                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ? WHERE contentId = ?';
+                        params = [req.body.userId, req.body.content, req.body.subject, req.body.contentId]
+                    }
+                }
+                else{
+                    if(req.body.contentImage !== 'undefined'){
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename]
+                    }
+                    else{
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, '']
+                    }
+                }
+                return [sql, params]
+            }
+            
+            const [sql, params] = sqlSelector()
+            
             try {
                 const [results] = await connection.query(sql, params);
             } catch(err) {
@@ -92,17 +124,51 @@ router.post('/save', async function(req, res, next) {
 });
 
 
+// content load
+router.post('/load', async function(req, res, next) {
+    const connection = await pool.getConnection(async conn => conn);
+    const sql = 'SELECT * FROM usercontents WHERE contentId = ?';
+    const params = [req.body.contentId]
+
+    let msg = undefined
+
+    let contentData = {}
+
+    try {
+        const [rows] = await connection.query(sql, params);
+
+        contentData['contentId'] = rows[0].contentId
+        contentData['subject'] = rows[0].subject
+        contentData['content'] = rows[0].content
+        contentData['image'] = rows[0].image
+
+        console.log(contentData)
+    } catch(err) {
+        msg = 'DB error'
+        console.log(err)
+    } finally { 
+        connection.release(); 
+    }
+    res.send({msg: msg, contentData: contentData});
+});
+
+
 
 // load image
 router.get('/image/:id', function(req,res){
     const path = 'images/' + req.params.id
-    
+
+    // console.log(req.params.id)
+    // console.log(req.query.sessionId)
+    // console.log(req.session.id)
+    // console.log(req.session.imageList)
+
     if(req.query.sessionId !== req.session.id){
         // validate sessionId
         res.writeHead(404);
         res.end('not found');
     }
-    else if(!(req.params.id in req.session.contentsList)){
+    else if(!(req.params.id in req.session.imageList)){
         // validate image contents
         res.writeHead(404);
         res.end('not found');
