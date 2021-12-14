@@ -5,13 +5,12 @@ const router = express.Router();
 
 // isSignIn
 router.post('/isSignIn', function(req, res, next) {
-    let msg = 'validation failed'
-
     if(req.body.sessionId === req.session.id){
-        msg = undefined
-    } 
-
-    res.send({msg: msg});
+        res.send()
+    }
+    else{
+        res.send({msg: 'The session has expired. Please sign in again.'});
+    }
 });
 
 // signIn
@@ -23,7 +22,7 @@ router.post('/signIn', async function(req, res, next) {
     let msg = undefined
     try {
         const [rows] = await connection.query(sql, params);
-        if (rows[0] === undefined || req.body.pw !== rows[0].userPw){
+        if (rows[0].userPw === '' || req.body.pw !== rows[0].userPw){
             msg = 'Incorrect ID or password';
         } else {
             req.session.userId = req.body.id
@@ -47,7 +46,7 @@ router.post('/signUp', async function(req, res, next) {
     try {
         const [results] = await connection.query(sql, params);
     } catch(err) {
-        msg = 'DB error'
+        msg = 'Duplicate ID. Please use a different ID.'
         console.log(err)
     } finally { 
         connection.release(); 

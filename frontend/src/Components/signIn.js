@@ -1,12 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { SignUp } from './'
+import { DefaultModal } from './modals';
+import { SignUp, Main } from './'
  
-function SignIn() {
+function SignIn({show, massage}) {
     
-    const [signUp, setSignUp] = useState(false)
+    const [state, setState] = useState(undefined)
     const [inputId, setInputId] = useState('')
     const [inputPw, setInputPw] = useState('')
+    const [modalState, setModalState] = useState({show:show, massage:massage})
+
+    // validate user & get image data
+    useEffect(() => {
+        if(sessionStorage.getItem('sessionId')){
+        axios.post('http://localhost:4000/user/isSignIn',
+        {
+            'userId': sessionStorage.getItem('userId'), 
+            'sessionId': sessionStorage.getItem('sessionId')
+        },
+        {
+            withCredentials: true
+        })
+        .then(res => {
+            // get response...
+            if(res.data.msg === undefined){
+                setState('Main')
+            } else {
+                sessionStorage.clear()
+                setModalState({show:true, massage:res.data.msg})
+            }
+        })
+        .catch(err =>{
+            // don't get response
+            setModalState({show:true, massage:err.message})
+            console.log(err.message)
+        })
+        }
+    },[])
  
     const handleInputId = (e) => {
         setInputId(e.target.value)
@@ -14,6 +44,11 @@ function SignIn() {
  
     const handleInputPw = (e) => {
         setInputPw(e.target.value)
+    }
+
+    // modal handler
+    const handleModal = () =>{
+        setModalState({show:false, massage:''})
     }
  
     // id, passwd => msg, userId, sessionId
@@ -28,28 +63,46 @@ function SignIn() {
             withCredentials: true
         })
         .then(res => {
+            // get response
             if(res.data.msg === undefined){
-                alert(res.data.userId)
                 sessionStorage.setItem('userId', res.data.userId)
                 sessionStorage.setItem('sessionId', res.data.sessionId)
+                setState('Main')
             } else {
-                alert(res.data.msg)
+                setModalState({show:true, massage:res.data.msg})
             }
-            document.location.href = '/'
         })
-        .catch()
+        .catch(err =>{
+            // don't get response
+            setModalState({show:true, massage:err.message})
+        })
     }
 
     const onClickGoSignUp = () => {
-        setSignUp(true)
+        setState('SignUp')
     }
 
-    if(signUp){
+    if(state === 'SignUp'){
+        
+        // select css file
+        document.getElementById('style-direction').href = '/css/signIn.css'
+            
+        // add body class
+        document.getElementById('root').className = 'text-center';
+
         return <SignUp />
+    }
+    else if(state === 'Main'){
+
+        // select css file
+        document.getElementById('style-direction').href = '/css/main.css'
+
+        return <Main />
     }
     else{
         return(
             <main class="form-signin">
+                <DefaultModal show={modalState.show} massage={modalState.massage} handleModal={handleModal}/> 
                 <form>
                     <input hidden="hidden" />
                     <img class="mb-4" src="assets/login_logo.png" alt="" width="200" height="auto"/>

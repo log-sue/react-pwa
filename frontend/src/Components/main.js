@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Content } from './';
+import { DefaultModal } from './modals';
 
 function Main() {
 
     const [state, setState] = useState(undefined)
     const [contentId, setContentId] = useState(undefined)
     const [contentsList, setContentsList] = useState(undefined)
+    const [modalState, setModalState] = useState({show:false, massage:''})
 
     useEffect(() => {
         axios.post('http://localhost:4000/contents/list',
@@ -18,15 +20,25 @@ function Main() {
             withCredentials: true
         })
         .then(res => {
-        if(res.data.msg === undefined){
-            setContentsList(res.data.contentsList)
-            console.log(res.data.contentsList)
-        } else {
-            alert(res.data.msg)
-        }
+            if(res.data.msg === undefined){
+                // get response ...
+                setContentsList(res.data.contentsList)
+                console.log(res.data.contentsList)
+            } 
+            else {
+                setModalState({show:true, massage: res.data.msg})
+            }
         })
-        .catch()
+        .catch(err => {
+            // don't get response
+            setModalState({show:true, massage: err.massage})
+        })
     },[])
+
+    // modal handler
+    const handleModal = () =>{
+        setModalState({show:false, massage:''})
+    }
 
     const onClickAdd = () => {
         setState('add')
@@ -53,6 +65,9 @@ function Main() {
     else{
         return(
             <div>
+                {/* modal */}
+                <DefaultModal show={modalState.show} massage={modalState.massage} handleModal={handleModal}/> 
+
                 <header>
                     <div class="collapse bg-dark" id="navbarHeader">
                         <div class="container">
@@ -112,8 +127,8 @@ function Main() {
                                 {contentsList && Object.keys(contentsList).map((contentId) => (
                                     <div class="col">
                                     <div class="card shadow-sm">
-                                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
-                        
+                                        {/* <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"/><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg> */}
+                                        <img src={'http://localhost:4000/contents/image/' + contentsList[contentId].image + '?sessionId=' + sessionStorage.getItem('sessionId')} class="img-thumbnail"/>
                                         <div class="card-body">
                                         <p class="card-text">{contentsList[contentId].subject}</p>
                                         <div class="d-flex justify-content-between align-items-center">
@@ -150,24 +165,9 @@ function Main() {
     
             </div>
     
-            // <div>
-            //     <div>
-            //         <h2>Home 페이지</h2>
-            //     </div>
-    
-            //     <p>
-            //         {imgFolder}
-            //     </p>
-                
-            //     <div>
-            //         <button type='button' onClick={onLogout}>Logout</button>
-            //     </div>
-            // </div>
-    
         )
 
     }
-
     
 }
  

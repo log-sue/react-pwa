@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Main } from './';
+import { DefaultModal } from './modals'
 import axios from 'axios';
 
 function Content(props) {
@@ -10,6 +11,7 @@ function Content(props) {
     const [contentImage, setContentImage]=useState(undefined)
     const [subject, setSubject]=useState(undefined)
     const [content, setContent]=useState(undefined)
+    const [modalState, setModalState] = useState({show:false, massage:''})
 
 
     useEffect(() => {
@@ -17,7 +19,7 @@ function Content(props) {
             loadContent(contentId)
         }
     },[contentId])
-
+    
 
     const loadContent = (contentId) =>{
         axios.post('http://localhost:4000/contents/load',
@@ -43,6 +45,11 @@ function Content(props) {
             }
         })
         .catch()
+    }
+
+    // modal handler
+    const handleModal = () =>{
+        setModalState({show:false, massage:''})
     }
 
     const handleInputImage = (e) => {
@@ -79,13 +86,17 @@ function Content(props) {
 
         axios.post('http://localhost:4000/contents/save', formData, config)
         .then(res => {
+            // get response
             if(res.data.msg === undefined){
-                alert('saved')
+                setModalState({show:true,massage:'saved'})
             } else {
-                alert(res.data.msg)
+                setModalState({show:true,massage:res.data.msg})
             }
         })
-        .catch()
+        .catch(err =>{
+            // don't get response
+            setModalState({show:true,massage:err.massage})
+        })
     }
 
     const onClickGoMain = () =>{
@@ -98,6 +109,7 @@ function Content(props) {
     else {
         return(
             <section>
+                <DefaultModal show={modalState.show} massage={modalState.massage} handleModal={handleModal}/> 
                 <div class="form-container align-self-center">
                 <div class="row">
                     <div class="col-sm-4">

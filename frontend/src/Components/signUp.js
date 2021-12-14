@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { SignIn } from './'
+import { DefaultModal } from './modals'
  
 function SignUp() {
     
@@ -8,6 +9,7 @@ function SignUp() {
     const [inputId, setInputId] = useState('')
     const [inputPw, setInputPw] = useState('')
     const [rePw, setRePw] = useState('')
+    const [modalState, setModalState] = useState({show:false, massage:''})
  
     const handleInputId = (e) => {
         setInputId(e.target.value)
@@ -19,6 +21,11 @@ function SignUp() {
 
     const handleRePw = (e) => {
         setRePw(e.target.value)
+    }
+
+    // modal handler
+    const handleModal = () =>{
+        setModalState({show:false, massage:''})
     }
  
     // id, passwd => msg, userId, sessionId
@@ -35,15 +42,21 @@ function SignUp() {
             })
             .then(res => {
                 if(res.data.msg === undefined){
-                    alert(res.data.userId)
+                    // get response
+                    setModalState({show:true, massage:'success sign up'})
                     setSignIn(true)
-                } else {
-                    alert(res.data.msg)
+                } 
+                else {
+                    setModalState({show:true, massage:res.data.msg})
                 }
             })
-            .catch()
-        }else{
-            alert('Passwords do not match')
+            .catch(err =>{
+                // don't get response
+                setModalState({show:true, massage:err.massage})
+            })
+        }
+        else{
+            setModalState({show:true, massage:'Passwords do not match'})
         }
     }
 
@@ -52,11 +65,12 @@ function SignUp() {
     }
 
     if(signIn){
-        return <SignIn />
+        return <SignIn show={modalState.show} massage={modalState.massage} />
     }
     else{
         return(
             <main class="form-signin">
+                <DefaultModal show={modalState.show} massage={modalState.massage} handleModal={handleModal}/> 
                 <form>
                     <input hidden="hidden" />
                     <img class="mb-4" src="assets/login_logo.png" alt="" width="200" height="auto"/>
