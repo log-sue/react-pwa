@@ -4,7 +4,7 @@ const db_info = {
     host: 'localhost',
     port: '3306',
     user: 'root',
-    password: 'qwer1234',
+    password: '11!!aabb',
     database: 'test'
 }
 

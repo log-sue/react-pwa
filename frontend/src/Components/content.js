@@ -10,6 +10,8 @@ function Content(props) {
     const [imageUrl, setImageUrl]=useState(undefined)
     const [contentImage, setContentImage]=useState(undefined)
     const [subject, setSubject]=useState(undefined)
+    const [author, setAuthor]=useState(undefined)
+    const [star, setStar]=useState(undefined)
     const [content, setContent]=useState(undefined)
     const [modalState, setModalState] = useState({show:false, massage:''})
 
@@ -34,11 +36,15 @@ function Content(props) {
             if(res.data.msg === undefined){
                 // set useState
                 setSubject(res.data.contentData.subject)
+                setAuthor(res.data.contentData.author)
+                setStar(res.data.contentData.star)
                 setContent(res.data.contentData.content)
                 setImageUrl('http://localhost:4000/contents/image/' + res.data.contentData.image + '?sessionId=' + sessionStorage.getItem('sessionId'))
                 
                 // set tag value
                 document.getElementById('subject').value = res.data.contentData.subject
+                document.getElementById('author').value = res.data.contentData.author
+                document.getElementById('star').value = res.data.contentData.star
                 document.getElementById('content').value = res.data.contentData.content
             } else {
                 alert(res.data.msg)
@@ -67,6 +73,16 @@ function Content(props) {
         setContent(e.target.value)
     }
 
+    const handleInputAuthor = (e) =>{
+        //값을 받아서 변수에 저장
+        setAuthor(e.target.value)
+    }
+
+    const handleInputStar = (e) =>{
+        //값을 받아서 변수에 저장
+        setStar(e.target.value)
+    }
+
     const onClickSave = () =>{
 
         // multipart/form-data
@@ -82,6 +98,8 @@ function Content(props) {
         formData.append("userId", sessionStorage.getItem('userId'))
         formData.append("contentImage", contentImage)
         formData.append("subject", subject)
+        formData.append("author", author)
+        formData.append("star", star)
         formData.append("content", content)
 
         axios.post('http://localhost:4000/contents/save', formData, config)
@@ -119,7 +137,9 @@ function Content(props) {
                         <form method="post">
                             <div class="mb-3"></div>
                             <input class="form-control" type="file" onChange={handleInputImage} />
-                            <input id = 'subject' class="form-control" type="text" onChange={handleInputSubject} placeholder="subject"/>
+                            <input id = 'subject' class="form-control" type="text" onChange={handleInputSubject} placeholder="제목"/>
+                            <input id = 'author' class="form-control" type="text" onChange={handleInputAuthor} placeholder="작가"/>
+                            <input id = 'star' class="form-control" type="text" onChange={handleInputStar} placeholder="평가"/>
                             <div class="mb-3"></div>
                             <div class="mb-3"></div>
                             <div class="mb-3"></div>
@@ -130,8 +150,8 @@ function Content(props) {
                 </div>
     
                 <textarea id = 'content' class="form-control" rows="7" onChange={handleInputContent}></textarea>
-                <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickSave}> save </button>
-                <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickGoMain}> go main </button>
+                <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickSave}> 저장 </button>
+                <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickGoMain}> 메인으로 </button>
             </section>
         )
     }

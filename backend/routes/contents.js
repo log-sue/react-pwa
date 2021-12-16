@@ -84,22 +84,22 @@ router.post('/save', async function(req, res, next) {
                 let params = ''
                 if(req.body.contentId !== 'undefined'){
                     if(req.body.contentImage !== 'undefined'){
-                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ?, image = ? WHERE contentId = ?';
-                        params = [req.body.userId, req.body.content, req.body.subject, req.file.filename, req.body.contentId]
+                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ?, author = ?, star = ?, image = ? WHERE contentId = ?';
+                        params = [req.body.userId, req.body.content, req.body.subject, req.body.author, req.body.star, req.file.filename, req.body.contentId ]
                     }
                     else{
-                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ? WHERE contentId = ?';
-                        params = [req.body.userId, req.body.content, req.body.subject, req.body.contentId]
+                        sql = 'UPDATE usercontents SET userId = ?, content = ?, subject = ?, author = ?, star = ? WHERE contentId = ?';
+                        params = [req.body.userId, req.body.content, req.body.subject, req.body.author, req.body.star, req.body.contentId]
                     }
                 }
                 else{
                     if(req.body.contentImage !== 'undefined'){
-                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
-                        params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename]
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename, req.body.author, req.body.star]
                     }
                     else{
-                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
-                        params = [, req.body.userId, req.body.content, req.body.subject, '']
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, '', req.body.author, req.body.star]
                     }
                 }
                 return [sql, params]
@@ -139,6 +139,8 @@ router.post('/load', async function(req, res, next) {
 
         contentData['contentId'] = rows[0].contentId
         contentData['subject'] = rows[0].subject
+        contentData['author'] = rows[0].author
+        contentData['star'] = rows[0].star
         contentData['content'] = rows[0].content
         contentData['image'] = rows[0].image
 

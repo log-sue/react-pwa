@@ -34,8 +34,9 @@ function SignUp() {
         if(inputPw === rePw){
             axios.post('http://localhost:4000/user/signUp', 
             {
+                // id is email
                 'id': inputId,
-                'pw': inputPw
+                'pw': inputPw,
             }, 
             {
                 withCredentials: true

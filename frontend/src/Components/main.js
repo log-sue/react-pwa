@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Content } from './';
+import { Content, BookCalendar } from './';
 import { DefaultModal } from './modals';
 
 function Main() {
@@ -9,6 +9,11 @@ function Main() {
     const [contentId, setContentId] = useState(undefined)
     const [contentsList, setContentsList] = useState(undefined)
     const [modalState, setModalState] = useState({show:false, massage:''})
+
+    const today=new Date();
+    const year=today.getFullYear();
+    const month = today.getMonth();
+    const date=today.getDate();
 
     useEffect(() => {
         axios.post('http://localhost:4000/contents/list',
@@ -44,6 +49,10 @@ function Main() {
         setState('add')
     }
 
+    const onClickCalendar = () => {
+        setState('calendar')
+    }
+
     const onClickView = (e) => {
         setState('view')
         setContentId(e.target.id)
@@ -62,6 +71,9 @@ function Main() {
     else if(state === 'view'){
         return <Content contentId={contentId} />
     }
+    else if(state === 'calendar'){
+        return <BookCalendar />
+    }
     else{
         return(
             <div>
@@ -74,13 +86,12 @@ function Main() {
                         <div class="row">
                             <div class="col-sm-8 col-md-7 py-4">
                             <h4 class="text-white">About</h4>
-                            <p class="text-muted">Add some information about the album below, the author, or any other background context. Make it a few sentences long so folks can pick up some informative tidbits. Then, link them off to some social networking sites or contact information.</p>
+                            <p class="text-muted">this page is for your recording. using this page, you can manage books what you read also record your comment about books.</p>
                             </div>
                             <div class="col-sm-4 offset-md-1 py-4">
                             <h4 class="text-white">User info</h4>
                             <ul class="list-unstyled">
-                                <li class="text-white" >text</li>
-                                <li><a href="#" class="text-white">link</a></li>
+                                <li class="text-white" >{sessionStorage.getItem('userId')}</li>
                                 <li><a href="#" onClick={onLogout} class="text-white">Logout</a></li>
                             </ul>
                             </div>
@@ -90,7 +101,7 @@ function Main() {
                     <div class="navbar navbar-dark bg-dark shadow-sm">
                         <div class="container">
                         <a href="#" class="navbar-brand d-flex align-items-center">
-                            <strong>제목</strong>
+                            <strong>log-book</strong>
                         </a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
                             <span class="navbar-toggler-icon"></span>
@@ -107,11 +118,11 @@ function Main() {
                     <section class="py-5 text-center container">
                         <div class="row py-lg-5">
                         <div class="col-lg-6 col-md-8 mx-auto">
-                            <h1 class="fw-light">게시글</h1>
-                            <p class="lead text-muted">메인 게시글에 대한 내용을 입력해요</p>
+                            <h1 class="fw-light">책 리스트</h1>
+                            <p class="lead text-muted">{year}.{month}.{date}</p>
                             <p>
-                            <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>Add content</a>
-                            <a href="#" class="btn btn-secondary my-2">Secondary action</a>
+                            <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>새 책</a>
+                            <a href="#" class="btn btn-secondary my-2" onClick={onClickCalendar}>캘린더</a>
                             </p>
                         </div>
                         </div>
@@ -158,9 +169,7 @@ function Main() {
                         <p class="float-end mb-1">
                         <a href="#">Back to top</a>
                         </p>
-                        <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
-                        <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="../getting-started/introduction/">getting started guide</a>.</p>
-                        <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+                        <div>@Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
                     </div>
                 </footer>
     
