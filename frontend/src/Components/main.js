@@ -160,6 +160,7 @@ function Main() {
                         </p>
                         <p class="mb-1">Album example is &copy; Bootstrap, but please download and customize it for yourself!</p>
                         <p class="mb-0">New to Bootstrap? <a href="/">Visit the homepage</a> or read our <a href="../getting-started/introduction/">getting started guide</a>.</p>
+                        <div>Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
                     </div>
                 </footer>
     
