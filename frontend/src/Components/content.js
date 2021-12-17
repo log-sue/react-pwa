@@ -14,7 +14,7 @@ function Content(props) {
     const [star, setStar]=useState(undefined)
     const [content, setContent]=useState(undefined)
     const [modalState, setModalState] = useState({show:false, massage:''})
-
+    const date = new Date()
 
     useEffect(() => {
         if(contentId){
@@ -100,6 +100,9 @@ function Content(props) {
         formData.append("subject", subject)
         formData.append("author", author)
         formData.append("star", star)
+        formData.append("year", date.getFullYear())
+        formData.append("month", date.getMonth()+1)
+        formData.append("day", date.getDate())
         formData.append("content", content)
 
         axios.post('http://localhost:4000/contents/save', formData, config)

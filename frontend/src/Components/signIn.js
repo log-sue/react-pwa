@@ -36,7 +36,7 @@ function SignIn({show, massage}) {
             console.log(err.message)
         })
         }
-    },[])
+    },[state])
  
     const handleInputId = (e) => {
         setInputId(e.target.value)

@@ -2,6 +2,7 @@ const CACHE_NAME = 'cache-v2';
 
 const FILES_TO_CACHE = [
   'index.html',
+  'offine.html'
 ];
 
 this.addEventListener('install', (evt) => {

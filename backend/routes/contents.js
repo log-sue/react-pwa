@@ -13,13 +13,14 @@ const fs = require('fs');
 // list
 router.post('/list', async function(req, res, next) {
     const connection = await pool.getConnection(async conn => conn);
-    const sql = 'SELECT * FROM usercontents WHERE userId = ?';
-    const params = [req.body.userId]
+    const sql = 'SELECT * FROM usercontents WHERE userId = ? AND year = ? AND month = ? AND day = ?';
+    const params = [req.body.userId, req.body.date.year, req.body.date.month, req.body.date.day]
+
+    console.log(req.body.date.year, req.body.date.month, req.body.date.day)
 
     let msg = undefined
 
     let contentsList = {}
-    let imageList = {}
 
     try {
         const [rows] = await connection.query(sql, params);
@@ -30,14 +31,11 @@ router.post('/list', async function(req, res, next) {
                 subject: row.subject, 
                 image: row.image
             }
-            imageList[row.image] = row.contentId
+            req.session.imageList[row.image] = row.contentId
         }
 
         // save contentsList in session for main
         req.session.contentsList = contentsList
-
-        // save user image list for content
-        req.session.imageList = imageList
 
         console.log(contentsList)
     } catch(err) {
@@ -94,12 +92,12 @@ router.post('/save', async function(req, res, next) {
                 }
                 else{
                     if(req.body.contentImage !== 'undefined'){
-                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?)';
-                        params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename, req.body.author, req.body.star]
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, req.file.filename, req.body.author, req.body.star, req.body.year, req.body.month, req.body.day]
                     }
                     else{
-                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?)';
-                        params = [, req.body.userId, req.body.content, req.body.subject, '', req.body.author, req.body.star]
+                        sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                        params = [, req.body.userId, req.body.content, req.body.subject, '', req.body.author, req.body.star, req.body.year, req.body.month, req.body.day]
                     }
                 }
                 return [sql, params]
@@ -185,5 +183,40 @@ router.get('/image/:id', function(req,res){
     }
 
 });
+
+// monthData
+// req : year, month
+// res : monthData = [{image, contentId, day} ... ]
+router.post('/monthData', async function(req, res, next) {
+    const connection = await pool.getConnection(async conn => conn);
+    const sql = 'SELECT * FROM usercontents WHERE year = ? AND month = ?';
+    const params = [req.body.year, req.body.month]
+
+    let msg = undefined
+    let monthData = {bookList : []}
+
+    try {
+        const [rows] = await connection.query(sql, params);
+        rows.map(row => {
+            monthData.bookList.push(
+                {
+                    'contentId' : row.contentId,
+                    'image' : row.image,
+                    'day' : row.day
+                }
+            )
+        })
+    } catch(err) {
+        msg = 'DB error'
+        console.log(err)
+    } finally { 
+        connection.release(); 
+    }
+
+    console.log(monthData)
+
+    res.send({msg: msg, monthData: monthData});
+});
+
 
 module.exports = router;

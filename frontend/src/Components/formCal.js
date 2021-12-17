@@ -108,8 +108,8 @@ const MONTHS = [
 // };
 
 class CalendarGrid extends React.Component {
+
   constructor(props) {
-      // let imageList = props.imageList
     super(props);
     this.state = {
       date: moment(),
@@ -118,6 +118,12 @@ class CalendarGrid extends React.Component {
     };
     this.calendarDateManager = new CalendarDateManager();
     this.grids = {};
+
+    // monthData
+    this.monthData = props.monthData
+    this.ViewHandler = props.ViewHandler
+    this.year = props.year
+    this.month = props.month
   }
 
   toPreviousMonth() {
@@ -238,11 +244,17 @@ class CalendarGrid extends React.Component {
                     ].join(" ")}
                 >
                   {tile.title}
-                  {/* imageList.map(image =>
-                        if image.date == tile.title :
-                            <img src=image.link ... /> 
-                    ) */}
-                  <img src="https://cdn.hellodd.com/news/photo/202102/91702_303070_1147.jpg" style={{width:"100%"}}/>
+                  
+                  {this.monthData.bookList.map(data => {
+                    if(data.day === tile.title){
+                      {console.log(data.day, data.contentId, data.image)}
+                      return (
+                        <img onClick={event => this.ViewHandler(data.contentId, this.year, this.month, tile.title)} src = {'http://localhost:4000/contents/image/' + data.image + '?sessionId=' + sessionStorage.getItem('sessionId')} style={{width:"100%"}}/>
+                      )
+                    }
+                  })
+                  }
+                  
                 </Paper>
               </GridListTile>
             ))

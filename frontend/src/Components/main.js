@@ -3,23 +3,27 @@ import axios from 'axios';
 import { Content, BookCalendar } from './';
 import { DefaultModal } from './modals';
 
-function Main() {
+function Main(prop) {
+
+    const today=new Date();
+    const year=today.getFullYear();
+    const month = today.getMonth();
+    const day=today.getDate();
 
     const [state, setState] = useState(undefined)
     const [contentId, setContentId] = useState(undefined)
     const [contentsList, setContentsList] = useState(undefined)
     const [modalState, setModalState] = useState({show:false, massage:''})
+    const [date, setDate] = useState(prop.view === undefined ? { year : year, month : month + 1 , day : day } : prop.view) // json { year : year, month : month , day : day }
 
-    const today=new Date();
-    const year=today.getFullYear();
-    const month = today.getMonth();
-    const date=today.getDate();
 
     useEffect(() => {
+
         axios.post('http://localhost:4000/contents/list',
         {
             'userId': sessionStorage.getItem('userId'), 
-            'sessionId': sessionStorage.getItem('sessionId')
+            'sessionId': sessionStorage.getItem('sessionId'),
+            'date': date
         },
         {
             withCredentials: true
@@ -38,6 +42,7 @@ function Main() {
             // don't get response
             setModalState({show:true, massage: err.massage})
         })
+
     },[])
 
     // modal handler
@@ -119,7 +124,7 @@ function Main() {
                         <div class="row py-lg-5">
                         <div class="col-lg-6 col-md-8 mx-auto">
                             <h1 class="fw-light">책 리스트</h1>
-                            <p class="lead text-muted">{year}.{month}.{date}</p>
+                            <p class="lead text-muted">{date.year}.{date.month}.{date.day}</p>
                             <p>
                             <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>새 책</a>
                             <a href="#" class="btn btn-secondary my-2" onClick={onClickCalendar}>캘린더</a>

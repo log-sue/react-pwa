@@ -4,8 +4,28 @@ const pool = db_config.init();
 const router = express.Router();
 
 // isSignIn
-router.post('/isSignIn', function(req, res, next) {
+router.post('/isSignIn', async function(req, res, next) {
     if(req.body.sessionId === req.session.id){
+
+        const connection = await pool.getConnection(async conn => conn);
+        const sql = 'SELECT * FROM usercontents WHERE userId = ?';
+        const params = [req.body.userId]
+
+        let imageList = {}
+
+        try {
+            const [rows] = await connection.query(sql, params);
+            // load user data 
+            for (const row of rows){
+                imageList[row.image] = row.contentId
+            }
+            // save user image list for content
+            req.session.imageList = imageList
+        } catch(err) {
+            console.log(err)
+        } finally { 
+            connection.release(); 
+        }
         res.send()
     }
     else{
