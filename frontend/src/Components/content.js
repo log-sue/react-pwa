@@ -14,7 +14,7 @@ function Content(props) {
     const [star, setStar]=useState(undefined)
     const [content, setContent]=useState(undefined)
     const [modalState, setModalState] = useState({show:false, massage:''})
-    const date = new Date()
+    const [date, setDate] = useState(props.date)
 
     useEffect(() => {
         if(contentId){
@@ -40,6 +40,14 @@ function Content(props) {
                 setStar(res.data.contentData.star)
                 setContent(res.data.contentData.content)
                 setImageUrl('http://localhost:4000/contents/image/' + res.data.contentData.image + '?sessionId=' + sessionStorage.getItem('sessionId'))
+
+                setDate( 
+                    {   year : res.data.contentData.year, 
+                        month : res.data.contentData.month, 
+                        day : res.data.contentData.day
+                    } 
+                )
+                
                 
                 // set tag value
                 document.getElementById('subject').value = res.data.contentData.subject
@@ -100,9 +108,9 @@ function Content(props) {
         formData.append("subject", subject)
         formData.append("author", author)
         formData.append("star", star)
-        formData.append("year", date.getFullYear())
-        formData.append("month", date.getMonth()+1)
-        formData.append("day", date.getDate())
+        formData.append("year", date.year)
+        formData.append("month", date.month)
+        formData.append("day", date.day)
         formData.append("content", content)
 
         axios.post('http://localhost:4000/contents/save', formData, config)
@@ -120,12 +128,39 @@ function Content(props) {
         })
     }
 
+    const onClickDelete = () =>{
+        axios.post('http://localhost:4000/contents/delete', {
+            contentId : contentId
+        },
+        {
+            withCredentials: true
+        })
+        .then(res => {
+            // get response
+            if(res.data.msg === undefined){
+                setModalState({show:true,massage:'delete'})
+            } else {
+                setModalState({show:true,massage:res.data.msg})
+            }
+        })
+        .catch(err =>{
+            // don't get response
+            setModalState({show:true,massage:err.massage})
+        })
+        .finally(() => {
+            setState('main')
+        })
+    }
+
     const onClickGoMain = () =>{
         setState('main')
     }
 
+
+    // view = json = {year:2021, month:12, ...}
+
     if(state === 'main'){
-        return <Main />
+        return <Main view={date} modalState={modalState}/>
     }
     else {
         return(
@@ -154,6 +189,7 @@ function Content(props) {
     
                 <textarea id = 'content' class="form-control" rows="7" onChange={handleInputContent}></textarea>
                 <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickSave}> 저장 </button>
+                <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickDelete}> 삭제 </button>
                 <button class="w-100 btn btn-lg btn-primary" type='button' onClick={onClickGoMain}> 메인으로 </button>
             </section>
         )

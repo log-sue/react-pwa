@@ -74,32 +74,6 @@ router.post('/signUp', async function(req, res, next) {
     res.send({msg: msg, userId:req.body.id});
 });
 
-// contentSave
-// router.post('/contentSave', async function(req, res, next) {
-//     const connection = await pool.getConnection(async conn => conn);
-//     const sql = 'INSERT INTO usercontents VALUES(?, ?, ?, ?, ?)';
-//     const params = [, req.body.userId, req.body.content, req.body.subject, req.body.image]
-
-//     console.log(req.body)
-
-//     let msg = undefined
-//     try {
-//         const [results] = await connection.query(sql, params);
-//     } catch(err) {
-//         msg = 'DB error'
-//         console.log(err)
-//     } finally { 
-//         connection.release(); 
-//     }
-//     res.send({msg: msg, userId:req.body.id});
-// });
-
-// logout
-// router.get("/logout", function(req,res){
-//     req.session.destroy(function(err) {
-//         res.redirect('/');
-//     })
-// });
 
 
 module.exports = router;

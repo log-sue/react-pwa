@@ -124,10 +124,17 @@ class CalendarGrid extends React.Component {
     this.ViewHandler = props.ViewHandler
     this.year = props.year
     this.month = props.month
+    this.CalHandler = props.CalHandler
   }
 
   toPreviousMonth() {
     const current = this.state.date;
+
+    // console.log(current.clone().subtract(1, "months").year())
+    // console.log(current.clone().subtract(1, "months").month()+1)
+
+    this.CalHandler(current.clone().subtract(1, "months").year(), current.clone().subtract(1, "months").month()+1)
+
     this.setState({
       date: current.clone().subtract(1, "months")
     });
@@ -135,6 +142,9 @@ class CalendarGrid extends React.Component {
 
   toNextMonth() {
     const current = this.state.date;
+
+    this.CalHandler(current.clone().add(1, "months").year(), current.clone().add(1, "months").month()+1)
+
     this.setState({
       date: current.clone().add(1, "months")
     });
@@ -224,16 +234,21 @@ class CalendarGrid extends React.Component {
         >
           {tileData.map(week =>
             week.map(tile => (
+
               <GridListTile
                 key={tile.id}
                 className={[classes.gridTile].join("")}
               >
+
                 <Paper
                   square={true}
-                  onClick={event => this.handleTileClick(event, tile)}
+                  onClick={event => 
+                    this.handleTileClick(event, tile)
+                  }
                   onMouseOver={event => this.handleTileHover(event, tile)}
                   onDoubleClick={event =>
-                    this.handleTileDoubleClick(event, tile)
+                    // this.handleTileDoubleClick(event, tile)
+                    this.ViewHandler(this.props.year, this.props.month, tile.title)
                   }
                   // onSelect={event => this.handleTileClick(event, tile, true)}
                   // onDragOver={event => this.handleTileClick(event, tile, true)}
@@ -245,17 +260,21 @@ class CalendarGrid extends React.Component {
                 >
                   {tile.title}
                   
-                  {this.monthData.bookList.map(data => {
+                  {this.props.monthData.bookList.map(data => {
                     if(data.day === tile.title){
                       {console.log(data.day, data.contentId, data.image)}
                       return (
-                        <img onClick={event => this.ViewHandler(data.contentId, this.year, this.month, tile.title)} src = {'http://localhost:4000/contents/image/' + data.image + '?sessionId=' + sessionStorage.getItem('sessionId')} style={{width:"100%"}}/>
+                        <img onClick={event => this.ViewHandler(this.props.year, this.props.month, tile.title)} src = {'http://localhost:4000/contents/image/' + data.image + '?sessionId=' + sessionStorage.getItem('sessionId')} style={{width:"100%"}}/>
                       )
                     }
                   })
                   }
                   
                 </Paper>
+
+
+
+
               </GridListTile>
             ))
           )}

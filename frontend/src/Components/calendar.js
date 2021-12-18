@@ -12,14 +12,17 @@ function BookCalendar() {
     // res = [{image, contentId, day} ... ]
 
     const [monthData, setMonthData] = useState(undefined)
-    const [date, setDate] = useState(new Date())
+    const [date, setDate] = useState({ year : new Date().getFullYear(), month : new Date().getMonth()+1 })
     const [view, setView] = useState(undefined)
 
     useEffect(() => {
+
+        console.log(date)
+
         axios.post('http://localhost:4000/contents/monthData',
         {
-            'year': date.getFullYear(),
-            'month': date.getMonth() + 1
+            'year': date.year,
+            'month': date.month
         },
         {
             withCredentials: true
@@ -28,13 +31,13 @@ function BookCalendar() {
             setMonthData(res.data.monthData)
             console.log(res.data.monthData)
         })
-    },[])
+    },[date])
 
-    const CalHandler = (CalDate) =>{
-        setDate(CalDate)
+    const CalHandler = (year, month) =>{
+        setDate({'year' : year, 'month' : month })
     }
 
-    const ViewHandler = (contentId, year, month, day) => {
+    const ViewHandler = (year, month, day) => {
         setView({
             'year' : year,
             'month' : month,
@@ -51,7 +54,8 @@ function BookCalendar() {
     }
 
     if(view===undefined){
-        return <CalendarGrid monthData={monthData} ViewHandler={ViewHandler} year={date.getFullYear()} month={date.getMonth() + 1}/>
+        console.log('before cal : ', monthData)
+        return <CalendarGrid monthData={monthData} ViewHandler={ViewHandler} CalHandler={CalHandler} year={date.year} month={date.month}/>
     }
     else{
         return <Main view={view} />

@@ -141,6 +141,9 @@ router.post('/load', async function(req, res, next) {
         contentData['star'] = rows[0].star
         contentData['content'] = rows[0].content
         contentData['image'] = rows[0].image
+        contentData['year'] = rows[0].year
+        contentData['month'] = rows[0].month
+        contentData['day'] = rows[0].day
 
         console.log(contentData)
     } catch(err) {
@@ -157,11 +160,6 @@ router.post('/load', async function(req, res, next) {
 // load image
 router.get('/image/:id', function(req,res){
     const path = 'images/' + req.params.id
-
-    // console.log(req.params.id)
-    // console.log(req.query.sessionId)
-    // console.log(req.session.id)
-    // console.log(req.session.imageList)
 
     if(req.query.sessionId !== req.session.id){
         // validate sessionId
@@ -181,6 +179,13 @@ router.get('/image/:id', function(req,res){
             res.end();
         });
     }
+
+    // // write image
+    // fs.readFile(path, function (err, data) {
+    //     res.writeHead(200);
+    //     res.write(data);
+    //     res.end();
+    // });
 
 });
 
@@ -216,6 +221,28 @@ router.post('/monthData', async function(req, res, next) {
     console.log(monthData)
 
     res.send({msg: msg, monthData: monthData});
+});
+
+
+
+// delete
+router.post('/delete', async function(req, res, next) {
+    const connection = await pool.getConnection(async conn => conn);
+    const sql = 'DELETE FROM usercontents WHERE contentId = ?';
+    const params = [req.body.contentId]
+
+    let msg = undefined
+
+    try {
+        const [rows] = await connection.query(sql, params);
+    } catch(err) {
+        msg = 'DB error'
+        console.log(err)
+    } finally { 
+        connection.release(); 
+    }
+
+    res.send({msg: msg});
 });
 
 

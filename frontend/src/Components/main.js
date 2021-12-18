@@ -13,12 +13,11 @@ function Main(prop) {
     const [state, setState] = useState(undefined)
     const [contentId, setContentId] = useState(undefined)
     const [contentsList, setContentsList] = useState(undefined)
-    const [modalState, setModalState] = useState({show:false, massage:''})
+    const [modalState, setModalState] = useState(prop.modalState===undefined ? {show:false, massage:''} : prop.modalState)
     const [date, setDate] = useState(prop.view === undefined ? { year : year, month : month + 1 , day : day } : prop.view) // json { year : year, month : month , day : day }
 
 
     useEffect(() => {
-
         axios.post('http://localhost:4000/contents/list',
         {
             'userId': sessionStorage.getItem('userId'), 
@@ -36,6 +35,7 @@ function Main(prop) {
             } 
             else {
                 setModalState({show:true, massage: res.data.msg})
+                console.log('main error')
             }
         })
         .catch(err => {
@@ -71,10 +71,10 @@ function Main(prop) {
     }
 
     if(state === 'add'){
-        return <Content />
+        return <Content date={date} />
     }
     else if(state === 'view'){
-        return <Content contentId={contentId} />
+        return <Content contentId={contentId} date={date}/>
     }
     else if(state === 'calendar'){
         return <BookCalendar />
@@ -123,11 +123,11 @@ function Main(prop) {
                     <section class="py-5 text-center container">
                         <div class="row py-lg-5">
                         <div class="col-lg-6 col-md-8 mx-auto">
-                            <h1 class="fw-light">책 리스트</h1>
+                            <h1 class="fw-light"> Book List </h1>
                             <p class="lead text-muted">{date.year}.{date.month}.{date.day}</p>
                             <p>
-                            <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>새 책</a>
-                            <a href="#" class="btn btn-secondary my-2" onClick={onClickCalendar}>캘린더</a>
+                            <a href="#" class="btn btn-primary my-2" onClick={onClickAdd}>add</a>
+                            <a href="#" class="btn btn-secondary my-2" onClick={onClickCalendar}>M</a>
                             </p>
                         </div>
                         </div>
@@ -150,17 +150,13 @@ function Main(prop) {
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-outline-secondary" id = {contentId} onClick={onClickView}>View</button>
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
                                             </div>
-                                            <small class="text-muted">9 mins</small>
                                         </div>
                                         </div>
                                     </div>
                                     </div>
                                 ))}
                                 
-
-
                             </div>
                         </div>
                     </div>
